@@ -1,0 +1,23 @@
+# v1
+
+url: https://public.api.spdigital.sg/frieza/graphql
+registration:
+  headers:
+    Content-Type: application/json
+  payload:
+    operationName: "SSW"
+    query: "mutation SSW($email: String!, $mobileNumber: String!, $block: String!, $floor: String!, $unit: String!) {\n  createTengahCCSSSWApplication(input: {details: {email: $email, mobileNumber: $mobileNumber, block: $block, floor: $floor, unit: $unit}}) {\n    token\n    node {\n      id\n      coolingConfig\n      shopDrawingID\n      numFCU\n      ccsCostCents\n      layoutVariationID\n      layoutVariationValid\n    }\n  }\n}\n"
+    variables:
+      block: "316A"
+      email: "a@a.com"
+      floor: "8"
+      mobileNumber: "88888888"
+      unit: "501"
+download:
+  headers:
+    Authorization: ""
+  payload:
+    query: "query SSWFanCoilPrices($applicationId: String!) {tengahSSWConfigValues(id: $applicationId) {node {fcu1: system1 {...fcuCosting}fcu2: system2 {...fcuCosting}fcu3: system3 {...fcuCosting}fcu4: system4 {...fcuCosting}fcu5: system5 {...fcuCosting}fcu6: system6 {...fcuCosting}}}}fragment fcuCosting on TengahSSWSystemPrices {conventional: conventionalCostCents  ccs: ccsCostCents  saved: savingsCents  savings: savingsPercent2DecimalPlaces}"
+    operationName: SSWFanCoilPrices
+    variables:
+      applicationId: ""
