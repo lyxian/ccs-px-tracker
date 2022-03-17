@@ -53,7 +53,7 @@ def downloadResult() -> dict:
 
     response = requests.post(URL, json=REG_PAYLOAD).json()
     HEADERS, PAYLOAD = updateConfig(*getAuth(response), HEADERS, PAYLOAD)
-    NOW = pendulum.now()
+    NOW = pendulum.now(tz='Asia/Singapore')
 
     result = requests.post(URL, headers=HEADERS, json=PAYLOAD).json()
 
