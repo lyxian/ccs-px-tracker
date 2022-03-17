@@ -12,17 +12,11 @@ configVars = loadData()
 DEBUG_MODE = False #eval(os.getenv("DEBUG_MODE"))
 SAVE_RESPONSE = False
 
+app = Flask(__name__)
+
 if __name__ == "__main__":
-
-    app = Flask(__name__)
     bot = createBot()
-    
-    if configVars['runScheduler']:
-        scheduler = BackgroundScheduler(timezone='Asia/Singapore')
-        scheduler.add_job(testServer, trigger='cron', args=[configVars['localhost'], configVars['payload']], name='dailyUpdate', hour='23', timezone='Asia/Singapore')
-
     weburl = os.getenv("PUBLIC_URL") + bot.token
-
     print(weburl)
 
     @app.route("/stop")
@@ -90,5 +84,10 @@ if __name__ == "__main__":
             return "Webhook not set...Try again..."
 
     start()
-    scheduler.start()
+
+    if configVars['runScheduler']:
+        scheduler = BackgroundScheduler(timezone='Asia/Singapore')
+        scheduler.add_job(testServer, trigger='cron', args=[configVars['localhost'], configVars['payload']], name='dailyUpdate', hour='23', timezone='Asia/Singapore')
+        scheduler.start()
+
     app.run(debug=DEBUG_MODE, host="0.0.0.0", port=int(os.environ.get("PORT", 5005)))
