@@ -60,7 +60,8 @@ if __name__ == "__main__":
                 # Download result
                 result = downloadResult()
                 # Get subscribers
-                users = configVars['userIds']
+                # users = configVars['userIds']
+                users = os.getenv('TELEGRAM_USERS')
 
                 # Update subscribers
                 for user in users:
