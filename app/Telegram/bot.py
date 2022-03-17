@@ -158,6 +158,13 @@ def dailyUpdate(chatId, data):
     }
     response = callTelegramAPI(method, params)
 
+    method = 'deleteMessage'
+    params = {
+        'chat_id': chatId,
+        'message_id': messageId+1,
+    }
+    _ = callTelegramAPI(method, params)
+
 def callTelegramAPI(method, params):
     url = 'https://api.telegram.org/bot{}/{}'.format(getToken(), method)
     response = requests.post(url=url, params=params)
