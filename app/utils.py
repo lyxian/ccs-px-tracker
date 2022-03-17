@@ -11,9 +11,8 @@ import requests
 import json
 import yaml
 
-def testServer(localhost):
+def testServer(localhost, payload):
     URL = localhost + '/dailyUpdate'
-    payload = {}
     response = requests.post(URL, json=payload)
     print(response.json())
 

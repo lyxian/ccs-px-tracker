@@ -19,7 +19,7 @@ if __name__ == "__main__":
     
     if configVars['runScheduler']:
         scheduler = BackgroundScheduler(timezone='Asia/Singapore')
-        scheduler.add_job(testServer, trigger='cron', args=configVars['localhost'], name='dailyUpdate', hour='23', timezone='Asia/Singapore')
+        scheduler.add_job(testServer, trigger='cron', args=[configVars['localhost'], configVars['payload']], name='dailyUpdate', hour='23', timezone='Asia/Singapore')
 
     weburl = os.getenv("PUBLIC_URL") + bot.token
 
