@@ -5,18 +5,9 @@ import telebot
 import os
 
 from Telegram.bot import createBot, dailyUpdate
-from utils import loadData, downloadResult
+from utils import testServer, loadData, downloadResult
 
 configVars = loadData()
-
-def tmp():
-    URL = configVars['localhost'] + '/dailyUpdate'
-    payload = {}
-    response = requests.post(URL, json=payload)
-    print(response.json())
-
-scheduler = BackgroundScheduler(timezone='Asia/Singapore')
-scheduler.add_job(tmp, trigger='cron', name='test', minute='*/5')
 
 DEBUG_MODE = False #eval(os.getenv("DEBUG_MODE"))
 SAVE_RESPONSE = False
@@ -25,6 +16,10 @@ if __name__ == "__main__":
 
     app = Flask(__name__)
     bot = createBot()
+    
+    if configVars['runScheduler']:
+        scheduler = BackgroundScheduler(timezone='Asia/Singapore')
+        scheduler.add_job(testServer, trigger='cron', args=configVars['localhost'], name='dailyUpdate', hour='23', timezone='Asia/Singapore')
 
     weburl = os.getenv("PUBLIC_URL") + bot.token
 

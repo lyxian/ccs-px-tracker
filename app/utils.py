@@ -11,6 +11,12 @@ import requests
 import json
 import yaml
 
+def testServer(localhost):
+    URL = localhost + '/dailyUpdate'
+    payload = {}
+    response = requests.post(URL, json=payload)
+    print(response.json())
+
 def loadData():
     with open('secrets.yaml', 'r') as stream:
         yamlData = yaml.safe_load(stream)

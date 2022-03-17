@@ -12,6 +12,7 @@ TRACKED_NUM = [1, 2, 3, 4, 5]
 # - test server response
 # - condense YEAR then MONTH
 # - manage subscribers 
+# - enable notif (edit Vs. delete & send)
 
 def createBot():
     TOKEN = getToken()
@@ -116,8 +117,18 @@ def dailyUpdate(chatId, data):
 
         message = formatMessage(lines)
         
-        # Edit Message in Tele
-        method = 'editMessageText'
+        # Unpin & Delete Message in Tele
+        params = {
+            'chat_id': chatId,
+            'message_id': messageId,
+        }
+        method = 'unpinChatMessage'
+        _ = callTelegramAPI(method, params)
+        method = 'deleteMessage'
+        _ = callTelegramAPI(method, params)
+
+        # Send Message in Tele
+        method = 'sendMessage'
         params = {
             'chat_id': chatId,
             'message_id': messageId,
@@ -138,14 +149,14 @@ def dailyUpdate(chatId, data):
         }
         response = callTelegramAPI(method, params)
 
-        # Pin Message in Tele
-        messageId = response.json()['result']['message_id']
-        method = 'pinChatMessage'
-        params = {
-            'chat_id': chatId,
-            'message_id': messageId,
-        }
-        response = callTelegramAPI(method, params)
+    # Pin Message in Tele
+    messageId = response.json()['result']['message_id']
+    method = 'pinChatMessage'
+    params = {
+        'chat_id': chatId,
+        'message_id': messageId,
+    }
+    response = callTelegramAPI(method, params)
 
 def callTelegramAPI(method, params):
     url = 'https://api.telegram.org/bot{}/{}'.format(getToken(), method)
