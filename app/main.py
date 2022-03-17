@@ -1,4 +1,3 @@
-import requests
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, request
 import telebot
@@ -85,7 +84,7 @@ if __name__ == "__main__":
 
     start()
 
-    if configVars['runScheduler']:
+    if configVars and configVars['runScheduler']:
         scheduler = BackgroundScheduler(timezone='Asia/Singapore')
         scheduler.add_job(testServer, trigger='cron', args=[configVars['localhost'], configVars['payload']], name='dailyUpdate', hour='23', timezone='Asia/Singapore')
         scheduler.start()

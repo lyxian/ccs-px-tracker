@@ -17,9 +17,13 @@ def testServer(localhost, payload):
     print(response.json())
 
 def loadData():
-    with open('secrets.yaml', 'r') as stream:
-        yamlData = yaml.safe_load(stream)
-    return yamlData
+    try:
+        with open('secrets.yaml', 'r') as stream:
+            yamlData = yaml.safe_load(stream)
+        return yamlData
+    except Exception as e:
+        print(e)
+        return ''
 
 def getAuth(response):
     token = response['data']['createTengahCCSSSWApplication']['token']
