@@ -55,7 +55,8 @@ if __name__ == "__main__":
     @app.route('/dailyUpdate', methods=['POST'])
     def _dailyUpdate():
         if request.method == 'POST':
-            if 'password' in request.json and request.json['password'] == configVars['password']:
+            password = os.getenv('PASSWORD') if not configVars else configVars['password']
+            if 'password' in request.json and request.json['password'] == password:
                 # Download result
                 result = downloadResult()
                 # Get subscribers
