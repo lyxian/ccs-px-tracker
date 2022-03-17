@@ -56,7 +56,7 @@ if __name__ == "__main__":
     def _dailyUpdate():
         if request.method == 'POST':
             password = os.getenv('PASSWORD') if not configVars else configVars['password']
-            if 'password' in request.json and request.json['password'] == password:
+            if 'password' in request.json and request.json['password'] == int(password):
                 # Download result
                 result = downloadResult()
                 # Get subscribers
