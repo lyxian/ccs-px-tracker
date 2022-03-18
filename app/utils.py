@@ -81,7 +81,7 @@ def addUser(userId):
     userDb = yamlData['directory']['users']
     if os.path.exists(userDb):
         # Existing Target
-        with open(userDb, 'a') as file:
+        with open(userDb, 'a+') as file:
             content = file.read()
             userList = content.split()
             
