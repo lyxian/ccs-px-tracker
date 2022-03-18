@@ -19,8 +19,8 @@ def createBot():
 
     bot = telebot.TeleBot(token=TOKEN)
 
-    @bot.message_handler(commands=["join"])
-    def _join(message):
+    @bot.message_handler(commands=["start"])
+    def _start(message):
         addUser(message.chat.id)
         text = "You have subscribed to ccs-px-tracker! You will be receiving daily updates on cost of CCS at 11pm SGT! ☺"
         bot.send_message(message.chat.id, text)
