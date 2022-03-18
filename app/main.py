@@ -55,13 +55,12 @@ if __name__ == "__main__":
     @app.route('/dailyUpdate', methods=['POST'])
     def _dailyUpdate():
         if request.method == 'POST':
-            password = os.getenv('PASSWORD') if not configVars else configVars['password']
+            password = os.getenv('PASSWORD') if not configVars else configVars['payload']['password']
             if 'password' in request.json and request.json['password'] == int(password):
                 # Download result
                 result = downloadResult()
                 # Get subscribers
-                # users = configVars['userIds']
-                users = getUsers()
+                users = getUsers() if not configVars else [configVars['userIds']]
 
                 # Update subscribers
                 for user in users:
@@ -88,7 +87,7 @@ if __name__ == "__main__":
 
     if configVars and configVars['runScheduler']:
         scheduler = BackgroundScheduler(timezone='Asia/Singapore')
-        scheduler.add_job(testServer, trigger='cron', args=[configVars['localhost'], configVars['payload']], name='dailyUpdate', hour='23', timezone='Asia/Singapore')
+        scheduler.add_job(testServer, trigger='cron', args=[configVars['localhost'], configVars['payload']], name='dailyUpdate', second='*/10', timezone='Asia/Singapore')
         scheduler.start()
 
     app.run(debug=DEBUG_MODE, host="0.0.0.0", port=int(os.environ.get("PORT", 5005)))
