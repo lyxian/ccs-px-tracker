@@ -4,7 +4,7 @@ import telebot
 import os
 
 from Telegram.bot import createBot, dailyUpdate
-from utils import testServer, loadData, downloadResult
+from utils import getUsers, testServer, loadData, downloadResult
 
 configVars = loadData()
 
@@ -61,7 +61,7 @@ if __name__ == "__main__":
                 result = downloadResult()
                 # Get subscribers
                 # users = configVars['userIds']
-                users = os.getenv('TELEGRAM_USERS').split(',')
+                users = getUsers()
 
                 # Update subscribers
                 for user in users:

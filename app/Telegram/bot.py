@@ -3,7 +3,7 @@ import requests
 import telebot
 import re
 
-from utils import getToken
+from utils import getToken, addUser
 
 TRACKED_NUM = [1, 2, 3, 4, 5]
 
@@ -21,6 +21,7 @@ def createBot():
 
     @bot.message_handler(commands=["join"])
     def _join(message):
+        addUser(message.chat.id)
         text = "You have subscribed to ccs-px-tracker! You will be receiving daily updates on cost of CCS at 11pm SGT! ☺"
         bot.send_message(message.chat.id, text)
         pass

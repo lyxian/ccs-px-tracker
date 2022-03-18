@@ -2,8 +2,9 @@
 
 ## TO-DO
 
-- manage subscribers
-- provide alert
+- manage subscribers (v2)
+- provide alert (v2)
+- provide logs
 
 ## Branches
 

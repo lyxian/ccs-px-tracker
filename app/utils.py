@@ -60,6 +60,43 @@ def downloadResult() -> dict:
     formattedResult = {'time': ', '.join(NOW.to_day_datetime_string().split(', ')[1:]), **formatResult(result)}
     return formattedResult
 
+# Manage subscribers (JSON)
+def getUsers():
+    with open('config.yaml', 'r') as stream:
+        yamlData = yaml.safe_load(stream)
+    
+    userDb = yamlData['directory']['userDb']
+    if os.path.exists(userDb):
+        with open(userDb, 'r') as file:
+            content = file.read()
+            userList = content.split()
+            return userList
+    else:
+        return []
+
+def addUser(userId):
+    with open('config.yaml', 'r') as stream:
+        yamlData = yaml.safe_load(stream)
+    
+    userDb = yamlData['directory']['users']
+    if os.path.exists(userDb):
+        # Existing Target
+        with open(userDb, 'a') as file:
+            content = file.read()
+            userList = content.split()
+            
+            # Append if not exists
+            if str(userId) not in userList:
+                file.write(f'{userId}\n')
+            else:
+                return
+    else:
+        # New Target
+        with open(userDb, 'w') as file:
+            file.write(f'{userId}\n')
+    print(f'{userId} added..')
+    return
+
 if __name__ == '__main__':
     with open('config.yaml', 'r') as stream:
         yamlData = yaml.safe_load(stream)
