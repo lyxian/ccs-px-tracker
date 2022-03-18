@@ -65,7 +65,7 @@ def getUsers():
     with open('config.yaml', 'r') as stream:
         yamlData = yaml.safe_load(stream)
     
-    userDb = yamlData['directory']['userDb']
+    userDb = yamlData['directory']['users']
     if os.path.exists(userDb):
         with open(userDb, 'r') as file:
             content = file.read()
