@@ -8,7 +8,7 @@ from utils import getUsers, testServer, loadData, downloadResult
 
 configVars = loadData()
 
-DEBUG_MODE = False #eval(os.getenv("DEBUG_MODE"))
+DEBUG_MODE = True #eval(os.getenv("DEBUG_MODE"))
 SAVE_RESPONSE = False
 
 app = Flask(__name__)
@@ -89,5 +89,6 @@ if __name__ == "__main__":
         scheduler = BackgroundScheduler(timezone='Asia/Singapore')
         scheduler.add_job(testServer, trigger='cron', args=[configVars['localhost'], configVars['payload']], name='dailyUpdate', second='*/10', timezone='Asia/Singapore')
         scheduler.start()
+        DEBUG_MODE = False # Avoid duplicate logs
 
     app.run(debug=DEBUG_MODE, host="0.0.0.0", port=int(os.environ.get("PORT", 5005)))
