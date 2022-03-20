@@ -3,7 +3,7 @@ import requests
 import telebot
 import re
 
-from utils import getToken
+from utils import getToken, addUser
 
 TRACKED_NUM = [1, 2, 3, 4, 5]
 
@@ -19,8 +19,10 @@ def createBot():
 
     bot = telebot.TeleBot(token=TOKEN)
 
-    @bot.message_handler(commands=["join"])
-    def _join(message):
+    @bot.message_handler(commands=["start"])
+    def _start(message):
+        addUser(message.chat.id)
+        unpinChat(message.chat.id)
         text = "You have subscribed to ccs-px-tracker! You will be receiving daily updates on cost of CCS at 11pm SGT! ☺"
         bot.send_message(message.chat.id, text)
         pass
@@ -70,6 +72,7 @@ def formatMessage(splitText):
     return '\n'.join(splitText)
 
 def dailyUpdate(chatId, data):
+    isChanged = True
     # Check for Pinned Message
     method = 'getChat'
     params = {
@@ -97,6 +100,7 @@ def dailyUpdate(chatId, data):
             # Check CONVENTIONAL
             if prev_conventional == curr_conventional:
                 conv_lines = lines[row_conv]
+                isChanged = False
             else:
                 new_conv = f'\n${curr_conventional} @ {currentDate} - Present'
                 conv_lines = re.sub('Present', prevDate, lines[row_conv]) + new_conv
@@ -105,6 +109,7 @@ def dailyUpdate(chatId, data):
             # Check CCS
             if prev_ccs == curr_ccs:
                 ccs_lines = lines[row_ccs]
+                isChanged = False
             else:
                 new_ccs = f'\n${curr_ccs} @ {currentDate} - Present'
                 ccs_lines = re.sub('Present', prevDate, lines[row_ccs]) + new_ccs
@@ -117,25 +122,35 @@ def dailyUpdate(chatId, data):
 
         message = formatMessage(lines)
         
-        # Unpin & Delete Message in Tele
-        params = {
-            'chat_id': chatId,
-            'message_id': messageId,
-        }
-        method = 'unpinChatMessage'
-        _ = callTelegramAPI(method, params)
-        method = 'deleteMessage'
-        _ = callTelegramAPI(method, params)
+        if isChanged: 
+            # Unpin & Delete Message in Tele
+            params = {
+                'chat_id': chatId,
+                'message_id': messageId,
+            }
+            method = 'unpinChatMessage'
+            _ = callTelegramAPI(method, params)
+            method = 'deleteMessage'
+            _ = callTelegramAPI(method, params)
 
-        # Send Message in Tele
-        method = 'sendMessage'
-        params = {
-            'chat_id': chatId,
-            'message_id': messageId,
-            'parse_mode': 'HTML',
-            'text': message
-        }
-        response = callTelegramAPI(method, params)
+            # Send Message in Tele
+            method = 'sendMessage'
+            params = {
+                'chat_id': chatId,
+                'parse_mode': 'HTML',
+                'text': message
+            }
+            response = callTelegramAPI(method, params)
+        else:
+            # Edit Message in Tele (No Alert)
+            method = 'editMessageText'
+            params = {
+                'chat_id': chatId,
+                'message_id': messageId,
+                'parse_mode': 'HTML',
+                'text': message
+            }
+            response = callTelegramAPI(method, params)
     else:
         # Format Message
         message = getMessage(data)
@@ -149,21 +164,22 @@ def dailyUpdate(chatId, data):
         }
         response = callTelegramAPI(method, params)
 
-    # Pin Message in Tele
-    messageId = response.json()['result']['message_id']
-    method = 'pinChatMessage'
-    params = {
-        'chat_id': chatId,
-        'message_id': messageId,
-    }
-    response = callTelegramAPI(method, params)
+    if isChanged:
+        # Pin Message in Tele
+        messageId = response.json()['result']['message_id']
+        method = 'pinChatMessage'
+        params = {
+            'chat_id': chatId,
+            'message_id': messageId,
+        }
+        response = callTelegramAPI(method, params)
 
-    method = 'deleteMessage'
-    params = {
-        'chat_id': chatId,
-        'message_id': messageId+1,
-    }
-    _ = callTelegramAPI(method, params)
+        method = 'deleteMessage'
+        params = {
+            'chat_id': chatId,
+            'message_id': messageId+1,
+        }
+        _ = callTelegramAPI(method, params)
 
 def callTelegramAPI(method, params):
     url = 'https://api.telegram.org/bot{}/{}'.format(getToken(), method)

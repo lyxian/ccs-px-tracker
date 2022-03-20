@@ -4,11 +4,11 @@ import telebot
 import os
 
 from Telegram.bot import createBot, dailyUpdate
-from utils import testServer, loadData, downloadResult
+from utils import getUsers, testServer, loadData, downloadResult
 
 configVars = loadData()
 
-DEBUG_MODE = False #eval(os.getenv("DEBUG_MODE"))
+DEBUG_MODE = True #eval(os.getenv("DEBUG_MODE"))
 SAVE_RESPONSE = False
 
 app = Flask(__name__)
@@ -55,13 +55,12 @@ if __name__ == "__main__":
     @app.route('/dailyUpdate', methods=['POST'])
     def _dailyUpdate():
         if request.method == 'POST':
-            password = os.getenv('PASSWORD') if not configVars else configVars['password']
+            password = os.getenv('PASSWORD') if not configVars else configVars['payload']['password']
             if 'password' in request.json and request.json['password'] == int(password):
                 # Download result
                 result = downloadResult()
                 # Get subscribers
-                # users = configVars['userIds']
-                users = os.getenv('TELEGRAM_USERS').split(',')
+                users = getUsers() if not configVars else [configVars['userIds']]
 
                 # Update subscribers
                 for user in users:
@@ -88,7 +87,8 @@ if __name__ == "__main__":
 
     if configVars and configVars['runScheduler']:
         scheduler = BackgroundScheduler(timezone='Asia/Singapore')
-        scheduler.add_job(testServer, trigger='cron', args=[configVars['localhost'], configVars['payload']], name='dailyUpdate', hour='23', timezone='Asia/Singapore')
+        scheduler.add_job(testServer, trigger='cron', args=[configVars['localhost'], configVars['payload']], name='dailyUpdate', second='*/10', timezone='Asia/Singapore')
         scheduler.start()
+        DEBUG_MODE = False # Avoid duplicate logs
 
     app.run(debug=DEBUG_MODE, host="0.0.0.0", port=int(os.environ.get("PORT", 5005)))

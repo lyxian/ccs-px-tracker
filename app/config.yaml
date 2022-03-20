@@ -21,3 +21,5 @@ download:
     operationName: SSWFanCoilPrices
     variables:
       applicationId: ""
+directory:
+  users: data/users
