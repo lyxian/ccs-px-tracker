@@ -75,26 +75,13 @@ def getUsers():
         return []
 
 def addUser(userId):
-    with open('config.yaml', 'r') as stream:
-        yamlData = yaml.safe_load(stream)
-    
-    userDb = yamlData['directory']['users']
-    if os.path.exists(userDb):
-        # Existing Target
-        with open(userDb, 'a+') as file:
-            content = file.read()
-            userList = content.split()
-            
-            # Append if not exists
-            if str(userId) not in userList:
-                file.write(f'{userId}\n')
-            else:
-                return
-    else:
-        # New Target
-        with open(userDb, 'w') as file:
-            file.write(f'{userId}\n')
+    # Mongo DB Commands
     print(f'{userId} added..')
+    return
+
+def removeUser(userId):
+    # Mongo DB Commands
+    print(f'{userId} removed..')
     return
 
 if __name__ == '__main__':

@@ -21,9 +21,23 @@ def createBot():
 
     @bot.message_handler(commands=["start"])
     def _start(message):
+        text = "Welcome to CCS-Price-Tracker-Bot! ☺ Here are the list of commands to get you started: \n/join - Subscribe to daily updates of CCS prices\n/quit - Un-subscribe from daily updates"
+        bot.send_message(message.chat.id, text)
+        pass
+
+    @bot.message_handler(commands=["join"])
+    def _join(message):
         addUser(message.chat.id)
         unpinChat(message.chat.id)
         text = "You have subscribed to ccs-px-tracker! You will be receiving daily updates on cost of CCS at 11pm SGT! ☺"
+        bot.send_message(message.chat.id, text)
+        pass
+
+    @bot.message_handler(commands=["quit"])
+    def _quit(message):
+        # removeUser(message.chat.id)
+        unpinChat(message.chat.id)
+        text = "You have UN-subscribed from ccs-px-tracker!"
         bot.send_message(message.chat.id, text)
         pass
 
