@@ -4,12 +4,15 @@
 
 - manage subscribers (v2)
 - provide alert (v2)
-- provide logs
+- mongoDB integration (v3)
+- update telebot reactions + more UI-friendly (v3)
+- provide logs + optimized message
 
 ## Branches
 
 - _master_
   - v1b
+  - v2
 - scheduler (for testing)
 - v1b (heroku-deploy ready)
   - no `secrets.yaml`
@@ -19,6 +22,9 @@
 - v2
   - manage subscribers
   - provide alert (edit if no change = no alert, else new)
+- v3
+  - mongoDB integration
+  - update telebot reactions (start/join/quit)
 
 ##Packages (list required packages & run .scripts/python-pip.sh)
 flask
