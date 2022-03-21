@@ -29,7 +29,9 @@
 ##Packages (list required packages & run .scripts/python-pip.sh)
 flask
 pyyaml
+pymongo
 pendulum
+dnspython
 apscheduler
 cryptography
 PyTelegramBotAPI

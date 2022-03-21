@@ -60,28 +60,89 @@ def downloadResult() -> dict:
     formattedResult = {'time': ', '.join(NOW.to_day_datetime_string().split(', ')[1:]), **formatResult(result)}
     return formattedResult
 
-# Manage subscribers (JSON)
-def getUsers():
-    with open('config.yaml', 'r') as stream:
-        yamlData = yaml.safe_load(stream)
-    
-    userDb = yamlData['directory']['users']
-    if os.path.exists(userDb):
-        with open(userDb, 'r') as file:
-            content = file.read()
-            userList = content.split()
-            return userList
-    else:
-        return []
+import pymongo
 
-def addUser(userId):
+# Manage subscribers
+class MongoDb:
+    def __init__(self, configData):
+        self.collection = self.connect(configData)
+
+    def connect(self, configData):
+        configVars = loadData()
+        key = bytes(os.getenv("KEY"), "utf-8")
+        password = Fernet(key).decrypt(bytes(os.getenv("SECRET_MONGODB"), "utf-8")).decode()
+        databaseConfig = configData['application']['database']
+        databaseConfig = {
+            'host': os.getenv('HOST') if not configVars else configVars['application']['database']['host'],
+            'password': password, **databaseConfig}
+        connection = pymongo.MongoClient(**databaseConfig)
+        database, collection = configData['query'].values()
+        return connection[database][collection]
+
+    def read(self):
+        return [_['chatId'] for _ in self.collection.find()]
+
+    def insert(self, chatId, name):
+        data = {'chatId': chatId, 'name': name}
+        try:
+            response = self.collection.insert_one(data)
+            print(f'chatId-{chatId} added successfully..')
+            # print(response.inserted_id, data)
+            # return response
+        except pymongo.errors.DuplicateKeyError:
+            print('chatId exists, aborting..')
+        return
+
+    def delete(self, chatId):
+        query = {'chatId': chatId}
+        result = list(self.collection.find(query))
+        print(result)
+        if result:
+            if len(result) == 1:
+                response = self.collection.delete_one(query)
+                print(f'chatId-{chatId} deleted successfully..')
+                # return response
+            else:
+                print(f'Duplicate chatId-{chatId} found, aborting..')
+        else:
+            print('chatId not found..')
+        return
+
+def getUsers():
     # Mongo DB Commands
-    print(f'{userId} added..')
+    with open('config.yaml', 'r') as stream:
+        try:
+            configData = yaml.safe_load(stream)
+        except yaml.YAMLError as ERROR:
+            print(ERROR)
+    
+    obj = MongoDb(configData)
+    return obj.read()
+
+def addUser(name, chatId):
+    # Mongo DB Commands
+    with open('config.yaml', 'r') as stream:
+        try:
+            configData = yaml.safe_load(stream)
+        except yaml.YAMLError as ERROR:
+            print(ERROR)
+    
+    obj = MongoDb(configData)
+    obj.insert(chatId, name)
+    # print(f'{userId} added..')
     return
 
-def removeUser(userId):
+def removeUser(chatId):
     # Mongo DB Commands
-    print(f'{userId} removed..')
+    with open('config.yaml', 'r') as stream:
+        try:
+            configData = yaml.safe_load(stream)
+        except yaml.YAMLError as ERROR:
+            print(ERROR)
+
+    obj = MongoDb(configData)
+    obj.delete(chatId)
+    # print(f'{userId} removed..')
     return
 
 if __name__ == '__main__':

@@ -3,7 +3,7 @@ import requests
 import telebot
 import re
 
-from utils import getToken, addUser
+from utils import getToken, addUser, removeUser
 
 TRACKED_NUM = [1, 2, 3, 4, 5]
 
@@ -27,7 +27,7 @@ def createBot():
 
     @bot.message_handler(commands=["join"])
     def _join(message):
-        addUser(message.chat.id)
+        addUser(message.chat.username, message.chat.id)
         unpinChat(message.chat.id)
         text = "You have subscribed to ccs-px-tracker! You will be receiving daily updates on cost of CCS at 11pm SGT! ☺"
         bot.send_message(message.chat.id, text)
@@ -35,7 +35,7 @@ def createBot():
 
     @bot.message_handler(commands=["quit"])
     def _quit(message):
-        # removeUser(message.chat.id)
+        removeUser(message.chat.id)
         unpinChat(message.chat.id)
         text = "You have UN-subscribed from ccs-px-tracker!"
         bot.send_message(message.chat.id, text)
@@ -225,20 +225,22 @@ def unpinChat(chatId):
     params = {
         'chat_id': chatId,
     }
-
-    messageId = requests.post(url=url, params=params).json()['result']['pinned_message']['message_id']
     
-    method = 'unpinChatMessage'
-    url = 'https://api.telegram.org/bot{}/{}'.format(getToken(), method)
-
-    params = {
-        'chat_id': chatId,
-        'message_id': messageId,
-        # 'disable_notification': False
-    }
+    responseJson = requests.post(url=url, params=params).json()
+    if 'pinned_message' in responseJson['result'].keys():
+        messageId = requests.post(url=url, params=params).json()['result']['pinned_message']['message_id']
     
-    response = requests.post(url=url, params=params)
-    print(response.json())
+        method = 'unpinChatMessage'
+        url = 'https://api.telegram.org/bot{}/{}'.format(getToken(), method)
+
+        params = {
+            'chat_id': chatId,
+            'message_id': messageId,
+            # 'disable_notification': False
+        }
+        
+        response = requests.post(url=url, params=params)
+        print(response.json())
     
 if __name__ == "__main__":
     bot = createBot()
