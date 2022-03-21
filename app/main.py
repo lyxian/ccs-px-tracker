@@ -1,5 +1,6 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, request
+import requests
 import telebot
 import os
 
@@ -49,8 +50,14 @@ if __name__ == "__main__":
             except:
                 return "Webhook not set...Try again...", 400
         elif request.method == "POST":
-            print("Wating...")
-            return "!", 200
+            print("Invalid Method (webhook)...")
+            return "!", 400
+
+    @app.route("/getIP", methods=["GET"])
+    def _getIP():
+        if request.method == "GET":
+            URL = 'https://api.ipify.org?format=json'
+            return request.get(URL).json(), 200
 
     @app.route('/dailyUpdate', methods=['POST'])
     def _dailyUpdate():
