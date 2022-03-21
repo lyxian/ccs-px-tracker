@@ -57,7 +57,7 @@ if __name__ == "__main__":
     def _getIP():
         if request.method == "GET":
             URL = 'https://api.ipify.org?format=json'
-            return request.get(URL).json(), 200
+            return requests.get(URL).json(), 200
 
     @app.route('/dailyUpdate', methods=['POST'])
     def _dailyUpdate():
