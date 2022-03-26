@@ -82,6 +82,9 @@ class MongoDb:
     def read(self):
         return [_['chatId'] for _ in self.collection.find()]
 
+    def has(self, chatId):
+        return chatId in self.read()
+
     def insert(self, chatId, name):
         data = {'chatId': chatId, 'name': name}
         try:
@@ -128,9 +131,12 @@ def addUser(name, chatId):
             print(ERROR)
     
     obj = MongoDb(configData)
-    obj.insert(chatId, name)
-    # print(f'{userId} added..')
-    return
+    if not obj.has(chatId):
+        obj.insert(chatId, name)
+        # print(f'{userId} added..')
+        return True
+    else:
+        return False
 
 def removeUser(chatId):
     # Mongo DB Commands
@@ -141,9 +147,12 @@ def removeUser(chatId):
             print(ERROR)
 
     obj = MongoDb(configData)
-    obj.delete(chatId)
-    # print(f'{userId} removed..')
-    return
+    if obj.has(chatId):
+        obj.delete(chatId)
+        # print(f'{userId} removed..')
+        return True
+    else:
+        return False
 
 if __name__ == '__main__':
     with open('config.yaml', 'r') as stream:
