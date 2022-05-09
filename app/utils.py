@@ -111,6 +111,17 @@ class MongoDb:
             print('chatId not found..')
         return
 
+    def update(self, chatId, payload):
+        try:
+            self.collection.find_one_and_update(
+                {'chatId': chatId},
+                payload
+            )
+            print(f'messageId set successfully for chatId-{chatId}..')
+        except Exception as e:
+            print(f'Error when updating document ({chatId}): {e}')
+        return
+
 def getUsers():
     # Mongo DB Commands
     with open('config.yaml', 'r') as stream:
@@ -150,6 +161,21 @@ def removeUser(chatId):
     if obj.has(chatId):
         obj.delete(chatId)
         # print(f'{userId} removed..')
+        return True
+    else:
+        return False
+
+def updateMessageId(chatId, messageId):
+    # Mongo DB Commands
+    with open('config.yaml', 'r') as stream:
+        try:
+            configData = yaml.safe_load(stream)
+        except yaml.YAMLError as ERROR:
+            print(ERROR)
+
+    obj = MongoDb(configData)
+    if obj.has(chatId):
+        obj.update(chatId, {'$set': {'messageId': messageId}})
         return True
     else:
         return False
