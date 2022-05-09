@@ -31,6 +31,8 @@
 - duplicate addUser
 - duplicate tele messages
 - ccs-api error (unit taken)
+  - alert if error
+- missing pinnedMessage
 
 ##Packages (list required packages & run .scripts/python-pip.sh)
 flask
