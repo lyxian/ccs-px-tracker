@@ -30,6 +30,7 @@
 
 - duplicate addUser
 - duplicate tele messages
+- ccs-api error (unit taken)
 
 ##Packages (list required packages & run .scripts/python-pip.sh)
 flask

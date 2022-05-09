@@ -10,7 +10,7 @@ registration:
     variables:
       block: "316A"
       email: "a@a.com"
-      floor: "8"
+      floor: "2"
       mobileNumber: "88888888"
       unit: "501"
 download:
