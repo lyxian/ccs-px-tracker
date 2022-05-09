@@ -25,6 +25,8 @@
 - v3
   - mongoDB integration
   - update telebot reactions (start/join/quit)
+- v4
+  - push data to mongoDB then compare
 
 ## Bugfix
 
