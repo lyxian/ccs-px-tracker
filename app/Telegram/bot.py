@@ -3,7 +3,7 @@ import requests
 import telebot
 import re
 
-from utils import getToken, addUser, removeUser
+from utils import getToken, addUser, removeUser, getPinnedMessageId, updatePinnedMessageId
 
 TRACKED_NUM = [1, 2, 3, 4, 5]
 
@@ -91,14 +91,33 @@ def formatMessage(splitText):
             splitText[_] = re.sub(r'(Updated on.*)', r'<i>\1</i>', splitText[_])
     return '\n'.join(splitText)
 
+# TODO
+# - how to migrate existing users
+CHECK_TELE = False
 def dailyUpdate(chatId, data):
     isChanged = True
     # Check for Pinned Message
-    method = 'getChat'
-    params = {
-        'chat_id': chatId,
-    }
-    chat = callTelegramAPI(method, params).json()
+    if CHECK_TELE:
+        method = 'getChat'
+        params = {
+            'chat_id': chatId,
+        }
+        chat = callTelegramAPI(method, params).json()
+    else:
+        result = getPinnedMessageId(chatId)
+        if result: # GET message + messageId
+            chat = {
+                'result': {
+                    'pinned_message': {
+                        'text': result['pinnedText'],
+                        'message_id': result['pinnedMessageId']
+                    }
+                }
+            }
+        else: # Init empty dict
+            chat = {
+                'result': {}
+            }
     if 'pinned_message' in chat['result'].keys():
         message = chat['result']['pinned_message']['text']
         messageId = chat['result']['pinned_message']['message_id']
@@ -183,6 +202,11 @@ def dailyUpdate(chatId, data):
             'text': message
         }
         response = callTelegramAPI(method, params)
+
+    # Update DB
+    if isChanged:
+        messageId = response.json()['result']['message_id']
+    updatePinnedMessageId(chatId, messageId, message)
 
     if isChanged:
         # Pin Message in Tele

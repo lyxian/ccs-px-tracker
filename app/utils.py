@@ -117,7 +117,7 @@ class MongoDb:
                 {'chatId': chatId},
                 payload
             )
-            print(f'messageId set successfully for chatId-{chatId}..')
+            print(f'\'pinnedMessageId\', \'pinnedText\' set successfully for chatId-{chatId}..')
         except Exception as e:
             print(f'Error when updating document ({chatId}): {e}')
         return
@@ -179,6 +179,43 @@ def updateMessageId(chatId, messageId):
         return True
     else:
         return False
+
+def getPinnedMessageId(chatId):
+    # Mongo DB Commands
+    with open('config.yaml', 'r') as stream:
+        try:
+            configData = yaml.safe_load(stream)
+        except yaml.YAMLError as ERROR:
+            print(ERROR)
+
+    obj = MongoDb(configData)
+    result = obj.collection.find_one({'chatId': chatId})
+    if result:
+        if 'pinnedMessageId' in result.keys():
+            return result
+        else:
+            return None
+    else:
+        return None
+
+def updatePinnedMessageId(chatId, messageId, text):
+    # Mongo DB Commands
+    with open('config.yaml', 'r') as stream:
+        try:
+            configData = yaml.safe_load(stream)
+        except yaml.YAMLError as ERROR:
+            print(ERROR)
+
+    obj = MongoDb(configData)
+    if obj.has(chatId):
+        obj.update(chatId, {'$set': {'pinnedMessageId': messageId, 'pinnedText': text}})
+        return True
+    else:
+        return False
+
+# with open('config.yaml', 'r') as stream:
+#     configData = yaml.safe_load(stream)
+# obj = MongoDb(configData)
 
 if __name__ == '__main__':
     with open('config.yaml', 'r') as stream:
