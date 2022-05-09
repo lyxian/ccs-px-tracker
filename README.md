@@ -26,6 +26,11 @@
   - mongoDB integration
   - update telebot reactions (start/join/quit)
 
+## Bugfix
+
+- duplicate addUser
+- duplicate tele messages
+
 ##Packages (list required packages & run .scripts/python-pip.sh)
 flask
 pyyaml

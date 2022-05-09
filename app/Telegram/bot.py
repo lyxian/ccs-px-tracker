@@ -9,10 +9,12 @@ TRACKED_NUM = [1, 2, 3, 4, 5]
 
 # TODO
 # + clean code
-# - test server response
+# + test server response
+# + manage subscribers 
+# + enable notif (edit Vs. delete & send)
 # - condense YEAR then MONTH
-# - manage subscribers 
-# - enable notif (edit Vs. delete & send)
+# - bugfix: duplicate addUser
+# - bugfix: duplicate sendMsg
 
 def createBot():
     TOKEN = getToken()
@@ -27,19 +29,23 @@ def createBot():
 
     @bot.message_handler(commands=["join"])
     def _join(message):
-        addUser(message.chat.username, message.chat.id)
-        unpinChat(message.chat.id)
-        text = "You have subscribed to ccs-px-tracker! You will be receiving daily updates on cost of CCS at 11pm SGT! ☺"
-        bot.send_message(message.chat.id, text)
-        pass
+        if addUser(message.chat.username, message.chat.id):
+            unpinChat(message.chat.id)
+            text = "You have subscribed to ccs-px-tracker! You will be receiving daily updates on cost of CCS at 11pm SGT! ☺"
+            bot.send_message(message.chat.id, text)
+            pass
+        else:
+            pass
 
     @bot.message_handler(commands=["quit"])
     def _quit(message):
-        removeUser(message.chat.id)
-        unpinChat(message.chat.id)
-        text = "You have UN-subscribed from ccs-px-tracker!"
-        bot.send_message(message.chat.id, text)
-        pass
+        if removeUser(message.chat.id):
+            unpinChat(message.chat.id)
+            text = "You have UN-subscribed from ccs-px-tracker!"
+            bot.send_message(message.chat.id, text)
+            pass
+        else:
+            pass
 
     @bot.message_handler(func= lambda message: True)
     def _reply(message):
