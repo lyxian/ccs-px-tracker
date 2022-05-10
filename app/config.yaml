@@ -25,7 +25,7 @@ directory:
   users: data/users
 query:
   database: ccs-px-tracker
-  collection: Subscribers
+  collection: Subscribers-dev
 application:
   name: ccs-px-tracker
   database:
