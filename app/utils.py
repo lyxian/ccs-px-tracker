@@ -38,10 +38,11 @@ def updateConfig(token, applicationId, headers, payload):
     payload['variables']['applicationId'] = applicationId
     return headers, payload
 
+TRACKED_NUM = ['1', '2', '3', '4', '5']
 def formatResult(result: dict) -> dict:
     data = result['data']['tengahSSWConfigValues']['node']
     # d = {k[-1]: {kk: (f'${int(_)/100:.2f}' if kk != 'savings' else f'{int(_)/100:.2f}%') for kk,_ in v.items()} for k,v in data.items()}
-    d = {int(k[-1]): {kk: (int(_)/100 if kk != 'savings' else int(_)/100) for kk,_ in v.items()} for k,v in data.items()}
+    d = {k[-1]: {kk: (int(_)/100 if kk != 'savings' else int(_)/100) for kk,_ in v.items()} for k,v in data.items() if k[-1] in TRACKED_NUM}
     return d
 
 def downloadResult() -> dict:
@@ -216,25 +217,69 @@ def updatePinnedMessageId(chatId, messageId, text):
     else:
         return False
 
+def comparePrices(result):
+    with open('config-data.yaml', 'r') as stream:
+        configData = yaml.safe_load(stream)
+    obj = MongoDb(configData)
+
+    currData = result
+    prevData = obj.collection.find_one()
+    if prevData is None:
+        response = obj.collection.insert_one(currData)
+        print('Added prices...')
+        return
+
+    columns = ['conventional', 'ccs']
+    isChanged = False
+    for num in TRACKED_NUM:
+        for column in columns:
+            if prevData[num][column] != currData[num][column]:
+                isChanged = True
+                break
+
+    if isChanged:
+        response = obj.collection.delete_one({'_id': prevData['_id']})
+        print('Removed previous prices...')
+        response = obj.collection.insert_one(currData)
+        print('Updated prices...')
+    else:
+        print('No change in prices...')
+    return
+
 # with open('config.yaml', 'r') as stream:
 #     configData = yaml.safe_load(stream)
 # obj = MongoDb(configData)
 
+with open('config-data.yaml', 'r') as stream:
+    configData = yaml.safe_load(stream)
+obj = MongoDb(configData)
+
 if __name__ == '__main__':
-    with open('config.yaml', 'r') as stream:
-        yamlData = yaml.safe_load(stream)
-        URL = yamlData['url']
-        REG_HEADERS, REG_PAYLOAD = yamlData['registration'].values()
-        HEADERS, PAYLOAD = yamlData['download'].values()
+    if 0:
+        with open('config.yaml', 'r') as stream:
+            yamlData = yaml.safe_load(stream)
+            URL = yamlData['url']
+            REG_HEADERS, REG_PAYLOAD = yamlData['registration'].values()
+            HEADERS, PAYLOAD = yamlData['download'].values()
 
-    response = requests.post(URL, json=REG_PAYLOAD).json()
-    HEADERS, PAYLOAD = updateConfig(*getAuth(response), HEADERS, PAYLOAD)
-    NOW = pendulum.now()
+        response = requests.post(URL, json=REG_PAYLOAD).json()
+        HEADERS, PAYLOAD = updateConfig(*getAuth(response), HEADERS, PAYLOAD)
+        NOW = pendulum.now()
 
-    result = requests.post(URL, headers=HEADERS, json=PAYLOAD).json()
+        result = requests.post(URL, headers=HEADERS, json=PAYLOAD).json()
 
-    formattedResult = {'time': ', '.join(NOW.to_day_datetime_string().split(', ')[1:]), **formatResult(result)}
-    print(formatResult(result))
+        formattedResult = {'time': ', '.join(NOW.to_day_datetime_string().split(', ')[1:]), **formatResult(result)}
+        print(formatResult(result))
 
-    with open(f'data/result_{NOW.to_date_string()}.json', 'w') as file:
-        file.write(json.dumps(formattedResult, indent=4))
+        with open(f'data/result_{NOW.to_date_string()}.json', 'w') as file:
+            file.write(json.dumps(formattedResult, indent=4))
+
+    if 0:
+        result = downloadResult()
+        with open('config-data.yaml', 'r') as stream:
+            configData = yaml.safe_load(stream)
+        obj = MongoDb(configData)
+
+        print(result)
+        response = obj.collection.insert_one(result)
+        print(response)

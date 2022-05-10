@@ -5,7 +5,7 @@ import re
 
 from utils import getToken, addUser, removeUser, getPinnedMessageId, updatePinnedMessageId
 
-TRACKED_NUM = [1, 2, 3, 4, 5]
+TRACKED_NUM = ['1', '2', '3', '4', '5']
 
 # TODO
 # + clean code
