@@ -206,7 +206,7 @@ def dailyUpdate(chatId, data):
     # Update DB
     if isChanged:
         messageId = response.json()['result']['message_id']
-    updatePinnedMessageId(chatId, messageId, message)
+    updatePinnedMessageId(chatId, messageId, re.sub(r'<.*?>', '', message))
 
     if isChanged:
         # Pin Message in Tele

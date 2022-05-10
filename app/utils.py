@@ -14,7 +14,10 @@ import yaml
 def testServer(localhost, payload):
     URL = localhost + '/dailyUpdate'
     response = requests.post(URL, json=payload)
-    print(response.json())
+    try:
+        print(response.json())
+    except:
+        print(response.content)
 
 def loadData():
     try:

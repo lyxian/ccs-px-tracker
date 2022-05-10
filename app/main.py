@@ -5,7 +5,7 @@ import telebot
 import os
 
 from Telegram.bot import createBot, dailyUpdate
-from utils import getUsers, testServer, loadData, downloadResult
+from utils import getUsers, testServer, loadData, downloadResult, addUser
 
 configVars = loadData()
 
@@ -67,10 +67,12 @@ if __name__ == "__main__":
                 # Download result
                 result = downloadResult()
                 # Get subscribers
-                users = getUsers() if not configVars else [configVars['userIds']]
+                users = getUsers() if not configVars else configVars['userIds']
 
                 # Update subscribers
                 for user in users:
+                    if addUser('Lyxian', user):
+                        print('Added Lyxian to db...')
                     print(user, result)
                     dailyUpdate(user, result)
 
