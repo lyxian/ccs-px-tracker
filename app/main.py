@@ -5,7 +5,7 @@ import telebot
 import os
 
 from Telegram.bot import createBot, dailyUpdate
-from utils import getUsers, testServer, loadData, downloadResult, addUser
+from utils import getUsers, removeUser, testServer, loadData, downloadResult, addUser
 
 configVars = loadData()
 
@@ -71,8 +71,6 @@ if __name__ == "__main__":
 
                 # Update subscribers
                 for user in users:
-                    if addUser('Lyxian', user):
-                        print('Added Lyxian to db...')
                     print(user, result)
                     dailyUpdate(user, result)
 
@@ -96,7 +94,7 @@ if __name__ == "__main__":
 
     if configVars and configVars['runScheduler']:
         scheduler = BackgroundScheduler(timezone='Asia/Singapore')
-        scheduler.add_job(testServer, trigger='cron', args=[configVars['localhost'], configVars['payload']], name='dailyUpdate', second='*/10', timezone='Asia/Singapore')
+        scheduler.add_job(testServer, trigger='cron', args=[configVars['localhost'], configVars['payload']], name='dailyUpdate', minute='*/1', timezone='Asia/Singapore')
         scheduler.start()
         DEBUG_MODE = False # Avoid duplicate logs
 
