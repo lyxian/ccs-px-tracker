@@ -8,11 +8,11 @@ registration:
     operationName: "SSW"
     query: "mutation SSW($email: String!, $mobileNumber: String!, $block: String!, $floor: String!, $unit: String!) {\n  createTengahCCSSSWApplication(input: {details: {email: $email, mobileNumber: $mobileNumber, block: $block, floor: $floor, unit: $unit}}) {\n    token\n    node {\n      id\n      coolingConfig\n      shopDrawingID\n      numFCU\n      ccsCostCents\n      layoutVariationID\n      layoutVariationValid\n    }\n  }\n}\n"
     variables:
-      block: "316A"
+      block: "307A"
       email: "a@a.com"
       floor: "2"
       mobileNumber: "88888888"
-      unit: "501"
+      unit: "318"
 download:
   headers:
     Authorization: ""
