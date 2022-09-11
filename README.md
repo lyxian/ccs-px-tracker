@@ -28,6 +28,10 @@
 - v4
   - push data to mongoDB then compare
 
+## Extra
+
+- integrate encryptionStore
+
 ## Bugfix
 
 - duplicate addUser
