@@ -16,8 +16,6 @@ app = Flask(__name__)
 
 if __name__ == "__main__":
     bot = createBot()
-    weburl = os.getenv("PUBLIC_URL") + bot.token
-    print(weburl)
 
     @app.route("/stop")
     def stop():
@@ -45,7 +43,7 @@ if __name__ == "__main__":
             bot.remove_webhook()
             print("Setting webhook...")
             try:
-                bot.set_webhook(url=weburl)
+                bot.set_webhook(url=os.getenv("PUBLIC_URL") + bot.token)
                 return "Webhook set!", 200
             except:
                 return "Webhook not set...Try again...", 400
@@ -84,7 +82,7 @@ if __name__ == "__main__":
         bot.remove_webhook()
         print("Setting webhook...", end=" ")
         try:
-            bot.set_webhook(url=weburl)
+            bot.set_webhook(url=os.getenv("PUBLIC_URL") + bot.token)
             print("Webhook set!")
             return "Webhook set!"
         except:
