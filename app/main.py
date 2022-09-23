@@ -63,26 +63,25 @@ if __name__ == "__main__":
         if request.method == 'POST':
             password = os.getenv('PASSWORD') if not configVars else configVars['payload']['password']
             if 'password' in request.json and request.json['password'] == int(password):
-                # Download result
-                result = downloadResult()
-                # Get subscribers
-                users = getUsers() if not configVars else configVars['userIds']
+                try:
+                    # Download result
+                    result = downloadResult()
+                    users = getUsers() if not configVars else configVars['userIds']
 
-                # Update subscribers
-                for user in users:
-                    print(user, result)
-                    try:
+                    # Update subscribers
+                    for user in users:
+                        print(user, result)
                         dailyUpdate(user, result)
-                    except Exception:
-                        error = traceback.format_exc().strip()
-                        try:
-                            response = postError(error)
-                            if response:
-                                print(response)
-                        except Exception as e:
-                            print(e.__repr__())
-                            return {'ERROR': e.__repr__()}, 503
-                return {'status': 'OK'}, 200
+                    return {'status': 'OK'}, 200
+                except Exception:
+                    error = traceback.format_exc().strip()
+                    try:
+                        response = postError(error)
+                        if response:
+                            print(response)
+                    except Exception as e:
+                        print(e.__repr__())
+                        return {'ERROR': e.__repr__()}, 503
             else:
                 return {'ERROR': 'Wrong password!'}, 401
         else:
