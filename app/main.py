@@ -78,13 +78,14 @@ if __name__ == "__main__":
                     try:
                         response = postError(error)
                         if response:
-                            print(response)
+                            print(f'=====APP ERROR=====\n{error}\n=====ERROR END=====')
                             return {'status': 'NOT_OK', 'ERROR': 'Error posted successfully!'}, 503
                         else:
                             # INTERNAL SERVER ERROR
                             return {'status': 'NOT_OK', 'ERROR': 'Unknown error!'}, 500
                     except Exception as e:
-                        print(e.__repr__())
+                        print(f'=====APP ERROR=====\n{error}\n=====ERROR END=====')
+                        print(f'=====LOG ERROR=====\n{e.__repr__()}\n=====ERROR END=====')
                         return {'status': 'NOT_OK', 'ERROR': e.__repr__()}, 503
             else:
                 return {'status': 'NOT_OK', 'ERROR': 'Wrong password!'}, 401
