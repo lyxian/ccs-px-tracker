@@ -15,7 +15,9 @@ def retrieveKey():
         }
         response = requests.post(payload['url'], json=payload['payload']).json()
         if response.get('status') == 'OK':
-            return response.get('KEY')
+            key = response.get('KEY')
+            os.environ['KEY'] = key
+            return key
         else:
             raise Exception('Bad response from KEY_STORE, please try again ..')
     else:
