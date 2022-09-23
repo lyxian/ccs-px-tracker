@@ -72,20 +72,24 @@ if __name__ == "__main__":
                     for user in users:
                         print(user, result)
                         dailyUpdate(user, result)
-                    return {'status': 'OK'}, 200
+                    return {'status': 'OK'}, 201
                 except Exception:
                     error = traceback.format_exc().strip()
                     try:
                         response = postError(error)
                         if response:
                             print(response)
+                            return {'status': 'NOT_OK', 'ERROR': 'Error posted successfully!'}, 503
+                        else:
+                            # INTERNAL SERVER ERROR
+                            return {'status': 'NOT_OK', 'ERROR': 'Unknown error!'}, 500
                     except Exception as e:
                         print(e.__repr__())
-                        return {'ERROR': e.__repr__()}, 503
+                        return {'status': 'NOT_OK', 'ERROR': e.__repr__()}, 503
             else:
-                return {'ERROR': 'Wrong password!'}, 401
+                return {'status': 'NOT_OK', 'ERROR': 'Wrong password!'}, 401
         else:
-            return {'ERROR': 'Nothing here!'}, 404
+            return {'status': 'NOT_OK', 'ERROR': 'Nothing here!'}, 404
 
     def start():
         bot.remove_webhook()
