@@ -1,11 +1,12 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, request
+import traceback
 import requests
 import telebot
 import os
 
 from Telegram.bot import createBot, dailyUpdate
-from utils import getUsers, removeUser, testServer, loadData, downloadResult, addUser
+from utils import getUsers, removeUser, testServer, loadData, downloadResult, addUser, postError
 
 configVars = loadData()
 
@@ -70,8 +71,17 @@ if __name__ == "__main__":
                 # Update subscribers
                 for user in users:
                     print(user, result)
-                    dailyUpdate(user, result)
-
+                    try:
+                        dailyUpdate(user, result)
+                    except Exception:
+                        error = traceback.format_exc().strip()
+                        try:
+                            response = postError(error)
+                            if response:
+                                print(response)
+                        except Exception as e:
+                            print(e.__repr__())
+                            return {'ERROR': e.__repr__()}, 503
                 return {'status': 'OK'}, 200
             else:
                 return {'ERROR': 'Wrong password!'}, 401
