@@ -76,7 +76,7 @@ if __name__ == "__main__":
 
                 return {'status': 'OK'}, 200
             else:
-                return {'ERROR': 'Wrong password!'}, 404
+                return {'ERROR': 'Wrong password!'}, 401
         else:
             return {'ERROR': 'Nothing here!'}, 404
 

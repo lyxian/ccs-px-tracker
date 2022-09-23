@@ -6,7 +6,7 @@ def retrieveKey():
     required = ['APP_NAME', 'APP_PASS', 'STORE_PASS', 'STORE_URL']
     if all(param in os.environ for param in required):
         payload = {
-            'url': os.getenv('STORE_URL'),
+            'url': '{}/{}'.format(os.getenv('STORE_URL'), 'getPass'),
             'payload': {
                 'password': int(os.getenv('STORE_PASS')),
                 'app': os.getenv('APP_NAME'),

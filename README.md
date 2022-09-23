@@ -31,6 +31,7 @@
 ## Extra
 
 - integrate encryptionStore
+- integrate route errors
 
 ## Bugfix
 
