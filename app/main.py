@@ -1,11 +1,12 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, request
+import traceback
 import requests
 import telebot
 import os
 
 from Telegram.bot import createBot, dailyUpdate
-from utils import getUsers, removeUser, testServer, loadData, downloadResult, addUser
+from utils import getUsers, removeUser, testServer, loadData, downloadResult, addUser, postError
 
 configVars = loadData()
 
@@ -16,8 +17,6 @@ app = Flask(__name__)
 
 if __name__ == "__main__":
     bot = createBot()
-    weburl = os.getenv("PUBLIC_URL") + bot.token
-    print(weburl)
 
     @app.route("/stop")
     def stop():
@@ -45,7 +44,7 @@ if __name__ == "__main__":
             bot.remove_webhook()
             print("Setting webhook...")
             try:
-                bot.set_webhook(url=weburl)
+                bot.set_webhook(url=os.getenv("PUBLIC_URL") + bot.token)
                 return "Webhook set!", 200
             except:
                 return "Webhook not set...Try again...", 400
@@ -64,27 +63,40 @@ if __name__ == "__main__":
         if request.method == 'POST':
             password = os.getenv('PASSWORD') if not configVars else configVars['payload']['password']
             if 'password' in request.json and request.json['password'] == int(password):
-                # Download result
-                result = downloadResult()
-                # Get subscribers
-                users = getUsers() if not configVars else configVars['userIds']
+                try:
+                    # Download result
+                    result = downloadResult()
+                    users = getUsers() if not configVars else configVars['userIds']
 
-                # Update subscribers
-                for user in users:
-                    print(user, result)
-                    dailyUpdate(user, result)
-
-                return {'status': 'OK'}, 200
+                    # Update subscribers
+                    for user in users:
+                        print(user, result)
+                        dailyUpdate(user, result)
+                    return {'status': 'OK'}, 201
+                except Exception:
+                    error = traceback.format_exc().strip()
+                    try:
+                        response = postError(error)
+                        if response:
+                            print(f'=====APP ERROR=====\n{error}\n=====ERROR END=====')
+                            return {'status': 'NOT_OK', 'ERROR': 'Error posted successfully!'}, 503
+                        else:
+                            # INTERNAL SERVER ERROR
+                            return {'status': 'NOT_OK', 'ERROR': 'Unknown error!'}, 500
+                    except Exception as e:
+                        print(f'=====APP ERROR=====\n{error}\n=====ERROR END=====')
+                        print(f'=====LOG ERROR=====\n{e.__repr__()}\n=====ERROR END=====')
+                        return {'status': 'NOT_OK', 'ERROR': e.__repr__()}, 503
             else:
-                return {'ERROR': 'Wrong password!'}, 404
+                return {'status': 'NOT_OK', 'ERROR': 'Wrong password!'}, 401
         else:
-            return {'ERROR': 'Nothing here!'}, 404
+            return {'status': 'NOT_OK', 'ERROR': 'Nothing here!'}, 404
 
     def start():
         bot.remove_webhook()
         print("Setting webhook...", end=" ")
         try:
-            bot.set_webhook(url=weburl)
+            bot.set_webhook(url=os.getenv("PUBLIC_URL") + bot.token)
             print("Webhook set!")
             return "Webhook set!"
         except:
