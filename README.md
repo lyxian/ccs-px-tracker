@@ -32,6 +32,7 @@
 
 - integrate encryptionStore
 - integrate route errors
+  - password related exceptions (log in app)
 
 ## Bugfix
 
